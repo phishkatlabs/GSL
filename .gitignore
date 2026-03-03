@@ -1,0 +1,48 @@
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+
+# Plugin (Java/Gradle)
+plugin/.gradle/
+plugin/build/
+plugin/out/
+
+# Web (Next.js/Node)
+web/node_modules/
+web/.next/
+web/out/
+web/build/
+web/.vercel/
+web/.pnp/
+web/.pnp.*
+web/.yarn/*
+!web/.yarn/patches
+!web/.yarn/plugins
+!web/.yarn/releases
+!web/.yarn/versions
+web/coverage/
+web/*.tsbuildinfo
+web/next-env.d.ts
+web/src/generated/prisma/
+
+# Environment variables
+.env
+.env*.local
+*.pem
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*

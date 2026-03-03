@@ -1,0 +1,46 @@
+# Proprietary License
+
+Copyright © 2026 GSL Team. All Rights Reserved.
+
+## Terms and Conditions
+
+This software and associated documentation files (the "Software") are made available for **viewing purposes only** to comply with hosting platform requirements. This license does NOT grant you any rights to use, copy, modify, or distribute the Software.
+
+### You are NOT permitted to:
+
+1. **Use** the Software for any purpose, commercial or non-commercial
+2. **Copy** or reproduce the Software in any form
+3. **Modify** or create derivative works based on the Software
+4. **Distribute**, sublicense, or transfer the Software to any third party
+5. **Run** your own instance or deployment of this Software
+6. **Fork** this repository for any purpose other than submitting pull requests to the original repository
+7. **Reverse engineer**, decompile, or disassemble the Software
+8. **Remove** or alter any copyright, trademark, or other proprietary notices
+
+### You ARE permitted to:
+
+1. **View** the source code for educational and transparency purposes
+2. **Submit** bug reports via GitHub Issues
+3. **Suggest** features or improvements via GitHub Discussions
+4. **Use** the official public GSL platform and plugin as an end-user
+5. **Submit** pull requests to this repository (which grants the copyright holder a license to use your contribution)
+
+### Disclaimer
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+### Enforcement
+
+Violations of this license may result in:
+
+- Immediate termination of any permissions granted herein
+- Legal action to protect intellectual property rights
+- Reporting to relevant hosting platforms
+
+### Contact
+
+For licensing inquiries or permission requests, please open a GitHub Issue.
+
+---
+
+**This is proprietary software.** The source code is visible for transparency but remains fully protected by copyright law.
