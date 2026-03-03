@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Player {
+  id        String   @id @default(uuid())
+  rsn       String   @unique // lowercase normalized
+  createdAt DateTime @default(now()) @map("created_at")
+
+  progress PlayerProgress[]
+  drops    Drop[]
+
+  @@map("players")
+}
+
+model Season {
+  id            String    @id @default(uuid())
+  seasonNumber  Int       @unique @map("season_number")
+  seed          Int
+  startTime     DateTime  @map("start_time")
+  endTime       DateTime  @map("end_time")
+  bingoWinnerRsn String?  @map("bingo_winner_rsn")
+  bingoCompletedAt DateTime? @map("bingo_completed_at")
+  raceWinnerRsn  String?  @map("race_winner_rsn")
+  raceCompletedAt DateTime? @map("race_completed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  items    SeasonItem[]
+  progress PlayerProgress[]
+  drops    Drop[]
+
+  @@index([startTime, endTime])
+  @@map("seasons")
+}
+
+model SeasonItem {
+  id             String @id @default(uuid())
+  seasonId       String @map("season_id")
+  itemId         Int    @map("item_id")
+  itemName       String @map("item_name")
+  points         Int
+  difficultyTier String @map("difficulty_tier") // common, uncommon, rare, ultra_rare, free
+  boardPosition  Int    @map("board_position") // 0-24 for 5x5 grid
+
+  season Season @relation(fields: [seasonId], references: [id])
+
+  @@unique([seasonId, itemId])
+  @@index([seasonId])
+  @@map("season_items")
+}
+
+model PlayerProgress {
+  id          String   @id @default(uuid())
+  seasonId    String   @map("season_id")
+  playerId    String   @map("player_id")
+  itemId      Int      @map("item_id")
+  completedAt DateTime @default(now()) @map("completed_at")
+  dropId      String   @map("drop_id")
+
+  season Season @relation(fields: [seasonId], references: [id])
+  player Player @relation(fields: [playerId], references: [id])
+  drop   Drop   @relation(fields: [dropId], references: [id])
+
+  @@unique([seasonId, playerId, itemId])
+  @@index([seasonId])
+  @@index([playerId])
+  @@map("player_progress")
+}
+
+model Drop {
+  id        String   @id @default(uuid())
+  seasonId  String   @map("season_id")
+  playerId  String   @map("player_id")
+  itemId    Int      @map("item_id")
+  npcId     Int?     @map("npc_id")
+  quantity  Int      @default(1)
+  world     Int?
+  timestamp DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+
+  season   Season          @relation(fields: [seasonId], references: [id])
+  player   Player          @relation(fields: [playerId], references: [id])
+  progress PlayerProgress[]
+
+  @@index([seasonId])
+  @@index([playerId])
+  @@index([createdAt])
+  @@map("drops")
+}

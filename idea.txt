@@ -537,3 +537,39 @@ Add indexes:
 * Infinite replayability
 
 This is genuinely platform-level potential.
+
+------------------------------------------------
+GSL Implementation Complete
+What was built
+Web Application (web/)
+
+Next.js 16 with App Router, TypeScript, Tailwind CSS
+Prisma 7 ORM with PostgreSQL (Neon-ready) — 5 tables: players, seasons, season_items, player_progress, drops
+5 API routes:
+POST /api/drop — Drop submission with validation, rate limiting (20/min per RSN), bingo/race win detection
+GET /api/leaderboard — Points, bingo, and race mode leaderboards
+GET /api/live-feed — Real-time drop feed (last 50 drops)
+GET /api/board — Current season's 5x5 board
+GET /api/season — Season metadata, archive listing
+Core logic:
+season.ts — Lazy season initialization (Sunday-to-Sunday UTC), bingo/race checking
+board.ts — Deterministic seeded PRNG board generation
+items.ts — Curated pool of ~300 OSRS items across 5 tiers with real item IDs
+3 pages: Home (board + leaderboard + live feed), Season archive, How It Works
+4 components: Board, Leaderboard, LiveFeed, SeasonTimer
+TypeScript compiles cleanly (zero errors)
+RuneLite Plugin (plugin/)
+
+Java 11 Gradle project following RuneLite plugin-hub conventions
+GslPlugin.java — Subscribes to ServerNpcLoot events, filters for board items, submits drops to API on background thread
+GslApiClient.java — OkHttp client for board fetch + drop submission
+GslConfig.java — Configurable API URL and enable/disable toggle
+GslPluginTest.java — Dev launcher for testing with RuneLite
+Plugin runs silently (no UI) — players check the website for progress
+Next steps to go live
+Create a Neon database at neon.tech and set DATABASE_URL in web/.env
+Run npx prisma migrate dev from the web/ directory to create tables
+Run npm run dev to start the web app locally
+Install JDK 11+ and run ./gradlew run in plugin/ to test the plugin with RuneLite
+Deploy web to Vercel (set web/ as root directory, add DATABASE_URL env var)
+Submit plugin to RuneLite Plugin Hub (fork plugin-hub repo, add manifest, open PR)
