@@ -20,9 +20,11 @@ export async function GET(request: NextRequest) {
     });
 
     // Enrich with item names from season items
-    const itemMap = new Map(season.items.map((si: SeasonItem) => [si.itemId, si]));
+    const itemMap = new Map(
+      season.items.map((si: SeasonItem) => [si.itemId, si]),
+    );
 
-    const feed = drops.map((drop: Drop & { player: Pick<Player, 'rsn'> }) => {
+    const feed = drops.map((drop: Drop & { player: Pick<Player, "rsn"> }) => {
       const seasonItem = itemMap.get(drop.itemId);
       return {
         id: drop.id,
@@ -45,6 +47,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Live feed error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

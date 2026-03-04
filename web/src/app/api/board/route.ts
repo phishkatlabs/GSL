@@ -13,7 +13,10 @@ export async function GET(request: NextRequest) {
     } else {
       const num = parseInt(seasonParam);
       if (isNaN(num)) {
-        return NextResponse.json({ error: "Invalid season parameter" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Invalid season parameter" },
+          { status: 400 },
+        );
       }
       season = await getSeasonByNumber(num);
     }
@@ -40,6 +43,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Board error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
