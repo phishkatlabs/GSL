@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getOrCreateActiveSeason } from "@/lib/season";
+import type { SeasonItem, Drop, Player } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,9 +20,9 @@ export async function GET(request: NextRequest) {
     });
 
     // Enrich with item names from season items
-    const itemMap = new Map(season.items.map((si) => [si.itemId, si]));
+    const itemMap = new Map(season.items.map((si: SeasonItem) => [si.itemId, si]));
 
-    const feed = drops.map((drop) => {
+    const feed = drops.map((drop: Drop & { player: Pick<Player, 'rsn'> }) => {
       const seasonItem = itemMap.get(drop.itemId);
       return {
         id: drop.id,

@@ -1,6 +1,6 @@
-import type { Season, SeasonItem } from "@/generated/prisma/client";
+import type { Season, SeasonItem, Drop, Player } from "@/generated/prisma";
 
-export type { Season, SeasonItem };
+export type { Season, SeasonItem, Drop, Player };
 
 export type SeasonWithItems = Season & {
   items: SeasonItem[];

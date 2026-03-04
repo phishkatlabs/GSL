@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrCreateActiveSeason, getSeasonByNumber } from "@/lib/season";
+import type { SeasonItem } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Season not found" }, { status: 404 });
     }
 
-    const board = season.items.map((item) => ({
+    const board = season.items.map((item: SeasonItem) => ({
       position: item.boardPosition,
       row: Math.floor(item.boardPosition / 5),
       col: item.boardPosition % 5,
