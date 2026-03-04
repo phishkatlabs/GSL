@@ -23,7 +23,10 @@ export async function GET(request: NextRequest) {
     } else {
       const num = parseInt(seasonParam);
       if (isNaN(num)) {
-        return NextResponse.json({ error: "Invalid season parameter" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Invalid season parameter" },
+          { status: 400 },
+        );
       }
       season = await getSeasonByNumber(num);
     }
@@ -33,16 +36,17 @@ export async function GET(request: NextRequest) {
     }
 
     if (mode === "points") {
+      // Points mode: count ALL drops (including duplicates)
       const rows = await prisma.$queryRaw<PointsRow[]>`
         SELECT
           p.rsn,
-          COALESCE(SUM(si.points), 0) as total_points,
-          COUNT(pp.id) as tiles_completed,
-          MAX(pp.completed_at) as last_completion
-        FROM player_progress pp
-        JOIN players p ON p.id = pp.player_id
-        JOIN season_items si ON si.season_id = pp.season_id AND si.item_id = pp.item_id
-        WHERE pp.season_id = ${season.id}
+          COALESCE(SUM(si.points * d.quantity), 0) as total_points,
+          COUNT(DISTINCT d.item_id) as tiles_completed,
+          MAX(d.timestamp) as last_completion
+        FROM drops d
+        JOIN players p ON p.id = d.player_id
+        JOIN season_items si ON si.season_id = d.season_id AND si.item_id = d.item_id
+        WHERE d.season_id = ${season.id}
         GROUP BY p.id, p.rsn
         ORDER BY total_points DESC, last_completion ASC
         LIMIT ${limit}
@@ -62,8 +66,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (mode === "bingo") {
-      // Players who have completed a row, column, or diagonal
-      // For now, we return the winner + all players sorted by completion count
+      // Bingo mode: show all players with any progress, sorted by tiles completed
       const rows = await prisma.$queryRaw<PointsRow[]>`
         SELECT
           p.rsn,
@@ -75,7 +78,6 @@ export async function GET(request: NextRequest) {
         JOIN season_items si ON si.season_id = pp.season_id AND si.item_id = pp.item_id
         WHERE pp.season_id = ${season.id}
         GROUP BY p.id, p.rsn
-        HAVING COUNT(pp.id) >= 5
         ORDER BY tiles_completed DESC, last_completion ASC
         LIMIT ${limit}
       `;
@@ -126,9 +128,15 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ error: "Invalid mode. Use: points, bingo, race" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid mode. Use: points, bingo, race" },
+      { status: 400 },
+    );
   } catch (error) {
     console.error("Leaderboard error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

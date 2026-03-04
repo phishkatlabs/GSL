@@ -1,5 +1,9 @@
 "use client";
 
+import { getItemImageUrl } from "@/lib/osrs-images";
+import Image from "next/image";
+import { useState } from "react";
+
 interface BoardTile {
   position: number;
   row: number;
@@ -16,11 +20,19 @@ interface BoardProps {
 }
 
 const tierColors: Record<string, string> = {
-  free: "border-green-500/50 bg-green-900/20",
-  common: "border-zinc-500/50 bg-zinc-800/50",
-  uncommon: "border-blue-500/50 bg-blue-900/20",
-  rare: "border-purple-500/50 bg-purple-900/20",
-  ultra_rare: "border-amber-500/50 bg-amber-900/20",
+  free: "border-emerald-500/60 bg-emerald-950/40",
+  common: "border-slate-500/50 bg-slate-900/50",
+  uncommon: "border-blue-500/60 bg-blue-950/40",
+  rare: "border-purple-500/60 bg-purple-950/40",
+  ultra_rare: "border-amber-500/60 bg-amber-950/40",
+};
+
+const tierGlow: Record<string, string> = {
+  free: "shadow-[0_0_8px_rgba(16,185,129,0.2)]",
+  common: "shadow-[0_0_8px_rgba(100,116,139,0.2)]",
+  uncommon: "shadow-[0_0_8px_rgba(59,130,246,0.3)]",
+  rare: "shadow-[0_0_8px_rgba(168,85,247,0.3)]",
+  ultra_rare: "shadow-[0_0_12px_rgba(245,158,11,0.4)]",
 };
 
 const tierLabels: Record<string, string> = {
@@ -31,41 +43,109 @@ const tierLabels: Record<string, string> = {
   ultra_rare: "Ultra Rare",
 };
 
-export default function Board({ tiles, completedItems = new Set() }: BoardProps) {
+function ItemImage({ itemId, itemName }: { itemId: number; itemName: string }) {
+  const [imgSrc, setImgSrc] = useState(() => getItemImageUrl(itemId, itemName));
+  const [attempts, setAttempts] = useState(0);
+
+  const handleError = () => {
+    // Try fallback URLs for seeds and other items with alternate naming
+    if (attempts === 0 && itemName.toLowerCase().includes("seed")) {
+      // Some seeds use numbered format like "Avantoe_seed_5.png"
+      const formatted = itemName.replace(/ /g, "_").replace(/'/g, "%27");
+      setImgSrc(`https://oldschool.runescape.wiki/images/${formatted}_5.png`);
+      setAttempts(1);
+    } else if (attempts === 1) {
+      // Try without _detail suffix
+      const formatted = itemName.replace(/ /g, "_").replace(/'/g, "%27");
+      setImgSrc(`https://oldschool.runescape.wiki/images/${formatted}.png`);
+      setAttempts(2);
+    } else {
+      // Hide image after all attempts
+      setImgSrc("");
+    }
+  };
+
+  if (!imgSrc) {
+    return (
+      <div className="w-9 h-9 bg-zinc-700/50 rounded flex items-center justify-center text-zinc-500 text-xs">
+        ?
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={imgSrc}
+      alt={itemName}
+      style={{
+        width: "auto",
+        height: "auto",
+        maxWidth: "36px",
+        maxHeight: "36px",
+      }}
+      className="pixelated"
+      onError={handleError}
+    />
+  );
+}
+
+export default function Board({
+  tiles,
+  completedItems = new Set(),
+}: BoardProps) {
   // Sort tiles by position to build the grid
   const sorted = [...tiles].sort((a, b) => a.position - b.position);
 
   return (
-    <div className="grid grid-cols-5 gap-2 max-w-2xl mx-auto">
+    <div className="grid grid-cols-5 gap-3 max-w-3xl mx-auto">
       {sorted.map((tile) => {
         const isCompleted = completedItems.has(tile.itemId);
         return (
           <div
             key={tile.position}
             className={`
-              relative border-2 rounded-lg p-2 text-center transition-all
-              ${isCompleted
-                ? "border-green-400 bg-green-900/40 shadow-[0_0_12px_rgba(74,222,128,0.3)]"
-                : tierColors[tile.tier] ?? tierColors.common
+              relative border-2 rounded-xl p-3 text-center transition-all hover:scale-105 cursor-pointer
+              ${
+                isCompleted
+                  ? "border-emerald-400 bg-emerald-900/50 shadow-[0_0_16px_rgba(52,211,153,0.4)]"
+                  : `${tierColors[tile.tier] ?? tierColors.common} ${tierGlow[tile.tier] ?? ""} hover:brightness-110`
               }
             `}
             title={`${tile.itemName} (${tile.points} pts) - ${tierLabels[tile.tier] ?? tile.tier}`}
           >
-            <div className="text-xs text-zinc-500 mb-1">
-              {tierLabels[tile.tier] ?? tile.tier}
+            {/* Item Image */}
+            <div className="mb-2 flex justify-center">
+              <div className="relative w-12 h-12 flex items-center justify-center">
+                <ItemImage itemId={tile.itemId} itemName={tile.itemName} />
+              </div>
             </div>
-            <div className={`text-sm font-medium leading-tight min-h-[2.5rem] flex items-center justify-center ${
-              isCompleted ? "text-green-300" : "text-zinc-200"
-            }`}>
+
+            {/* Item Name */}
+            <div
+              className={`text-xs font-semibold leading-tight min-h-[2rem] flex items-center justify-center mb-1 ${
+                isCompleted ? "text-emerald-200" : "text-zinc-100"
+              }`}
+            >
               {tile.itemName}
             </div>
-            <div className={`text-xs mt-1 ${
-              isCompleted ? "text-green-400" : "text-amber-400/70"
-            }`}>
-              {tile.points} pts
+
+            {/* Points & Tier */}
+            <div className="flex items-center justify-between text-xs mt-2 pt-2 border-t border-white/10">
+              <span
+                className={`font-mono ${
+                  isCompleted ? "text-emerald-400" : "text-amber-400"
+                }`}
+              >
+                {tile.points}pts
+              </span>
+              <span className="text-zinc-500 text-[10px]">
+                {tierLabels[tile.tier]}
+              </span>
             </div>
+
+            {/* Completion Checkmark */}
             {isCompleted && (
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs">
+              <div className="absolute -top-2 -right-2 w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center text-sm shadow-lg animate-pulse">
                 ✓
               </div>
             )}

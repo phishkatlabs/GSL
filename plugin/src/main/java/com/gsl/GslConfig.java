@@ -14,7 +14,7 @@ public interface GslConfig extends Config
 	)
 	default String apiUrl()
 	{
-		return "https://gsl.vercel.app";
+		return "http://localhost:3000";
 	}
 
 	@ConfigItem(

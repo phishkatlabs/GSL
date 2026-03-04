@@ -33,8 +33,16 @@ tasks.withType(JavaCompile) {
     options.release.set(11)
 }
 
+// Include plugin properties at JAR root for RuneLite detection
+jar {
+    from('runelite-plugin.properties') {
+        into('')
+    }
+}
+
 task run(type: JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.gsl.GslPluginTest'
     args = ['--developer-mode', '--debug']
+    jvmArgs = ['-ea', '-Drunelite.pluginhub.skip=true']
 }
